@@ -49,7 +49,15 @@ function runSchedulerBot() {
 }
 
 var SchedulerBot = (function () {
-  var WEEKDAY_NAMES = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  var WEEKDAY_MATCHERS = [
+    { day: 0, pattern: /\b(?:next\s+)?(?:sun|sunday)\b/ },
+    { day: 1, pattern: /\b(?:next\s+)?(?:mon|monday)\b/ },
+    { day: 2, pattern: /\b(?:next\s+)?(?:tue|tues|tuesday)\b/ },
+    { day: 3, pattern: /\b(?:next\s+)?(?:wed|wednesday)\b/ },
+    { day: 4, pattern: /\b(?:next\s+)?(?:thu|thur|thurs|thursday)\b/ },
+    { day: 5, pattern: /\b(?:next\s+)?(?:fri|friday)\b/ },
+    { day: 6, pattern: /\b(?:next\s+)?(?:sat|saturday)\b/ }
+  ];
   var MONTH_NAMES = {
     jan: 0, january: 0,
     feb: 1, february: 1,
@@ -442,11 +450,10 @@ var SchedulerBot = (function () {
   }
 
   function extractWeekdayDate(body, referenceDate) {
-    for (var i = 0; i < WEEKDAY_NAMES.length; i += 1) {
-      var weekday = WEEKDAY_NAMES[i];
-      var pattern = new RegExp('\\b(?:next\\s+)?' + weekday + '(?:day)?\\b');
-      if (pattern.test(body)) {
-        return nextWeekday(referenceDate, i, /\bnext\s+/.test(body));
+    for (var i = 0; i < WEEKDAY_MATCHERS.length; i += 1) {
+      var matcher = WEEKDAY_MATCHERS[i];
+      if (matcher.pattern.test(body)) {
+        return nextWeekday(referenceDate, matcher.day, /\bnext\s+/.test(body));
       }
     }
     return null;
